@@ -51,6 +51,19 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
+    minio:
+        image: 'quay.io/minio/minio'
+        command: 'minio server /data --console-address ":${MINIO_CONSOLE_PORT}"'
+        ports:
+            - '${MINIO_WEB_PORT:-9000}:9000'
+            - '${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}'
+        environment:
+            MINIO_ROOT_USER: '${MINIO_USERNAME}'
+            MINIO_ROOT_PASSWORD: '${MINIO_PASSWORD}'
+        volumes:
+            - 'sail-minio:/data'
+        networks:
+            - sail
     redis:
         image: 'redis:alpine'
         ports:
@@ -78,6 +91,8 @@ networks:
         driver: bridge
 volumes:
     sail-mysql:
+        driver: local
+    sail-minio:
         driver: local
     sail-redis:
         driver: local
