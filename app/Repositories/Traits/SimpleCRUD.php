@@ -34,6 +34,7 @@ trait SimpleCRUD
 
     public function create(array $attributes)
     {
+//        DB::beginTransaction();
         return $this->model::create($attributes);
     }
 

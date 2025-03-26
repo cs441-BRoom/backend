@@ -1,10 +1,11 @@
 ### logout
 POST http://localhost:80/api/logout
 Accept: application/json
-Authorization: Bearer 2|WwKzY8tk0cPMRCXlu9Y4fLKEYyxZjPv2HK43Y7i856b42e92
+Authorization: Bearer 1|OsdA992PWS17braxSCgFx9d7ue1BgsxKOnDE9wc6ced23775
 
 ### login
 POST http://localhost:80/api/login
+Accept: application/json
 Content-Type: application/json
 
 {
@@ -14,6 +15,7 @@ Content-Type: application/json
 
 ### Register
 POST http://localhost:80/api/register
+Accept: application/json
 Content-Type: application/json
 
 {
