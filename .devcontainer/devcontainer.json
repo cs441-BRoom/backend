@@ -15,7 +15,8 @@
 				"onecentlin.laravel5-snippets",
 				"onecentlin.laravel-blade",
 				"Postman.postman-for-vscode",
-				"humao.rest-client"
+				"humao.rest-client",
+				"ms-azuretools.vscode-docker"
 			],
 			"settings": {}
 		}
