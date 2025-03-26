@@ -27,7 +27,7 @@ class RegisterRequest extends FormRequest
             'lastname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'auth_type' => 'required|in:local,google,facebook',
-            'password' => 'required|string|confirmed',
+            'password' => 'required|string|min:6|confirmed',
 
         ];
     }
