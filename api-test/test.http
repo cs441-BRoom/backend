@@ -1,0 +1,8 @@
+### GET request to test
+GET {{ host }}/api/
+
+###
+
+### GET request to /api/user
+
+GET {{ host }}/api/users
