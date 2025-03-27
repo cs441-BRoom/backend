@@ -19,6 +19,7 @@ class NewsResource extends JsonResource
             'workspace_id' => $this->workspace_id,
             'title' => $this->title,
             'content' => $this->content,
+            'comments_count' => $this->comments_count,
             'created_by' => $this->created_by,
             'created_at' => $this->created_at->toDateTimeString(),
         ];
