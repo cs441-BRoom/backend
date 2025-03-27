@@ -23,17 +23,20 @@ class WorkspaceRepository
 
     public function findByOwner(int $userId)
     {
-        return $this->model::where('created_by', $userId)->get();
+        return $this->model::withCount('users')
+            ->where('created_by', $userId)
+            ->get();
     }
 
 
     public function findJoinedWorkspacesByUserId(int $userId)
     {
-        return $this->model::whereIn('workspace_id', function ($query) use ($userId) {
-            $query->select('workspace_id')
-                ->from('workspace_members')
-                ->where('user_id', $userId);
-        })->get();
+        return $this->model::withCount('users')
+            ->whereIn('workspace_id', function ($query) use ($userId) {
+                $query->select('workspace_id')
+                    ->from('workspace_members')
+                    ->where('user_id', $userId);
+            })->get();
     }
 
 }

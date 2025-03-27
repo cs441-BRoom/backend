@@ -19,9 +19,11 @@ class WorkspaceResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'join_code' => $this->join_code,
+            'members_count' => $this->users_count + 1,
             'created_by' => $this->created_by,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+
         ];
     }
 }
