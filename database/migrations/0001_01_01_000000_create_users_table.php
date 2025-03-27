@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->enum('auth_type', ['local', 'google', 'facebook']);
             $table->rememberToken();
             $table->timestamps();
+            $table->SoftDeletes();
         });;
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

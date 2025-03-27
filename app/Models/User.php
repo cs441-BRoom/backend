@@ -11,7 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, SoftDeletes;
     protected $primaryKey = 'user_id';
 
     /**
@@ -36,6 +36,31 @@ class User extends Authenticatable
     public function workspaces()
     {
         return $this->belongsToMany(Workspace::class, 'workspace_members', 'user_id', 'workspace_id')->withPivot('role');
+    }
+
+    public function news()
+    {
+        return $this->hasMany(News::class, 'created_by');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class, 'user_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'user_id');
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class, 'created_by');
+    }
+
+    public function submissions()
+    {
+        return $this->hasMany(AssignmentSubmission::class, 'user_id');
     }
 
     /**
