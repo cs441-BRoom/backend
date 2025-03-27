@@ -25,4 +25,14 @@ class News extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'news_id', 'news_id');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class, 'news_id', 'news_id');
+    }
 }

@@ -12,7 +12,7 @@ class Comment extends Model
 
     protected $primaryKey = 'comment_id';
     protected $fillable = [
-        'news_id', 'user_id', 'content'
+        'news_id', 'created_by', 'content'
     ];
 
     // Relationships

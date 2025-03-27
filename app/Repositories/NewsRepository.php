@@ -19,7 +19,7 @@ class NewsRepository
 
     public function findByWorkspaceId(int $workspaceId): Collection
     {
-        return $this->model::where('workspace_id', $workspaceId)->get();
+        return $this->model::withCount('comments')->where('workspace_id', $workspaceId)->get();
     }
 
     public function update(array $attributes, int $news_id)
