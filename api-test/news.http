@@ -2,7 +2,7 @@
 GET /api/workspaces/{{ owner_workspace_id }}/news HTTP/1.1
 Accept: application/json
 Host: localhost
-Authorization: Bearer {{ token1 }}
+Authorization: Bearer {{ token2 }}
 
 ###  Owner Create News
 POST /api/news HTTP/1.1

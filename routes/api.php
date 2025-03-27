@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CommentController;
+use App\Http\Controllers\API\LikeController;
 use App\Http\Controllers\API\NewsController;
 use App\Http\Controllers\API\WorkspaceController;
 use Illuminate\Support\Facades\Route;
@@ -46,6 +47,11 @@ Route::middleware('throttle:api')->group(function () {
             Route::post('/', [CommentController::class, 'store']);
             Route::put('/{commentId}', [CommentController::class, 'update']);
             Route::delete('/{commentId}', [CommentController::class, 'destroy']);
+        });
+
+        Route::prefix('like')->group(function () {
+            Route::post('/', [LikeController::class, 'like']);
+            Route::delete('/{newsId}', [LikeController::class, 'unlike']);
         });
 
     });

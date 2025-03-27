@@ -20,6 +20,7 @@ class WorkspaceController extends Controller
 
     public function store(WorkspaceRequest $request): JsonResponse
     {
+        $request->validated();
         $workspace = $this->workspaceService->create(array_merge(
             $request->validated(),
             ['created_by' => auth()->id()]
@@ -33,6 +34,7 @@ class WorkspaceController extends Controller
 
     public function join(JoinWorkspaceRequest $request): JsonResponse
     {
+        $request->validated();
         try {
             $workspace = $this->workspaceService->join(auth()->id(), $request->join_code);
 
@@ -82,10 +84,4 @@ class WorkspaceController extends Controller
             ], 400);
         }
     }
-
-//    public function update(int $workspaceId): JsonResponse
-//    {
-//
-//    }
-
 }
