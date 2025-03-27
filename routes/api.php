@@ -2,13 +2,9 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\NewsController;
+use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\WorkspaceController;
 use Illuminate\Support\Facades\Route;
-
-//Route::get('/user', function (Request $request) {
-//    return $request->user();
-//})->middleware('auth:sanctum');
-//
 
 Route::middleware('throttle:api')->group(function () {
     Route::get('/', function () {
@@ -25,6 +21,12 @@ Route::middleware('throttle:api')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::prefix('profile')->group(function () {
+            Route::post('/upload', [UserController::class, 'upload']);
+            Route::put('/', [UserController::class, 'update']);
+            Route::delete('/', [UserController::class, 'destroy']);
+        });
+
         Route::prefix('workspaces')->group(function () {
             Route::post('/', [WorkspaceController::class, 'store']);
             Route::post('/join', [WorkspaceController::class, 'join']);
@@ -41,6 +43,4 @@ Route::middleware('throttle:api')->group(function () {
         });
 
     });
-
-
 });
