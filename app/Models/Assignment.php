@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Assignment extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $primaryKey = 'assignment_id';
     protected $fillable = [
@@ -24,4 +24,10 @@ class Assignment extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');
-    }}
+    }
+
+    public function assignmentSubmission()
+    {
+        return $this->hasMany(AssignmentSubmission::class, 'assignment_id');
+    }
+}
