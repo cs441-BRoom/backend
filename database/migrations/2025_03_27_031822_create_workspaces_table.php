@@ -8,12 +8,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('workspaces', function (Blueprint $table) {
-            $table->id('workspace_id');
-            $table->string('name', 255);
+            $table->bigIncrements('workspace_id');
+            $table->string('name');
             $table->text('description')->nullable();
-            $table->string('join_code', 20)->unique();
-            $table->timestamp('created_at')->useCurrent();
-            $table->softDeletes();
+            $table->string('join_code')->unique();
+            $table->timestamps();
+            $table->foreignId('created_by')->constrained('users', 'user_id');
+            $table->SoftDeletes();
         });
     }
 
