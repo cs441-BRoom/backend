@@ -10,6 +10,10 @@ Authorization: Bearer {{ token1 }}
     "description": "string"
 }
 
+> {%
+    client.global.set("join_code", response.body.workspace.join_code)
+    client.global.set("owner_workspace_id", response.body.workspace.workspace_id)
+%}
 
 ### Join Workspace
 POST /api/workspaces/join HTTP/1.1
@@ -19,8 +23,12 @@ Host: localhost
 Authorization: Bearer {{ token2 }}
 
 {
-    "join_code": "JDYL7TK211"
+    "join_code": "{{ join_code }}"
 }
+
+> {%
+    client.global.set("join_workspace_id", response.body.workspace.workspace_id)
+%}
 
 ### Get My Workspace
 GET /api/workspaces/my HTTP/1.1
@@ -35,7 +43,7 @@ Host: localhost
 Authorization: Bearer {{ token2 }}
 
 ### Leave Workspace
-DELETE /api/workspaces/workspaces/3/leave HTTP/1.1
+DELETE /api/workspaces/{{ join_workspace_id }}/leave HTTP/1.1
 Accept: application/json
 Host: localhost
 Authorization: Bearer {{ token2 }}
