@@ -1,0 +1,53 @@
+### Create Workspace
+POST /api/workspaces HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token1 }}
+
+{
+    "name": "string",
+    "description": "string"
+}
+
+
+### Join Workspace
+POST /api/workspaces/join HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token2 }}
+
+{
+    "join_code": "JDYL7TK211"
+}
+
+### Get My Workspace
+GET /api/workspaces/my HTTP/1.1
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token1 }}
+
+### Get Joined Workspace
+GET /api/workspaces/joined HTTP/1.1
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token2 }}
+
+### Leave Workspace
+DELETE /api/workspaces/workspaces/3/leave HTTP/1.1
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token2 }}
+
+
+
+
+
+
+
+
+
+
+
+

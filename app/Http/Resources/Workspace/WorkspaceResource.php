@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Http\Resources\Workspace;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class WorkspaceResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'workspace_id' => $this->workspace_id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'join_code' => $this->join_code,
+            'created_by' => $this->created_by,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
+    }
+}
