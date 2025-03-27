@@ -83,4 +83,9 @@ class WorkspaceController extends Controller
         }
     }
 
+//    public function update(int $workspaceId): JsonResponse
+//    {
+//
+//    }
+
 }

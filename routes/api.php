@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\NewsController;
 use App\Http\Controllers\API\WorkspaceController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,8 +30,16 @@ Route::middleware('throttle:api')->group(function () {
             Route::post('/join', [WorkspaceController::class, 'join']);
             Route::get('/my', [WorkspaceController::class, 'getMyWorkspaces']);
             Route::get('/joined', [WorkspaceController::class, 'getJoinedWorkspaces']);
-            Route::delete('/workspaces/{workspaceId}/leave', [WorkspaceController::class, 'leaveWorkspace']);
+            Route::delete('/{workspaceId}/leave', [WorkspaceController::class, 'leaveWorkspace']);
+            Route::get('/{workspaceId}/news', [NewsController::class, 'index']);
         });
+
+        Route::prefix('news')->group(function () {
+            Route::post('/', [NewsController::class, 'store']);
+            Route::put('/{newsId}', [NewsController::class, 'update']);
+            Route::delete('/{newsId}', [NewsController::class, 'destroy']);
+        });
+
     });
 
 

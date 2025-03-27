@@ -42,6 +42,16 @@ class WorkspaceService
             throw new \Exception('You cannot join the workspace you created.');
         }
 
+
+        $isMember = $workspace->users()
+            ->where('workspace_members.user_id', $userId)
+            ->exists();
+
+        if ($isMember) {
+            throw new \Exception('You are already a member of this workspace.');
+        }
+
+
         $workspace->users()->attach($userId, ['role' => 'member']);
 
         return $workspace;
