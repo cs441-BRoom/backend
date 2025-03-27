@@ -21,7 +21,7 @@ class NewsController extends Controller
 
     public function index(NewsRequest $request,int $workspaceId): JsonResponse
     {
-//        $request->validated();
+        $request->validated();
         $news = $this->newsService->getAllNewsByWorkspace($workspaceId);
         return response()->json([
             'message' => 'Fetched news successfully.',
@@ -31,6 +31,7 @@ class NewsController extends Controller
 
     public function store(CreateNewsRequest $request): JsonResponse
     {
+        $request->validated();
         $news = $this->newsService->createNews($request->validated());
         return response()->json([
             'message' => 'News created successfully.',
@@ -40,6 +41,7 @@ class NewsController extends Controller
 
     public function update(UpdateNewsRequest $request, int $newsId): JsonResponse
     {
+        $request->validated();
         $updated = $this->newsService->updateNews($newsId, $request->validated());
         return response()->json([
             'message' => $updated ? 'News updated successfully.' : 'Failed to update news.',

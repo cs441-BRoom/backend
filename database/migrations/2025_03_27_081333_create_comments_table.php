@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->bigIncrements('comment_id');
             $table->foreignId('news_id')->constrained('news', 'news_id');
-            $table->foreignId('user_id')->constrained('users', 'user_id');
+            $table->foreignId('created_by')->constrained('users', 'user_id');
             $table->text('content');
             $table->timestamps();
             $table->SoftDeletes();
