@@ -31,9 +31,8 @@ class NewsResource extends JsonResource
             'like_count' => $this->likes()->count(),
             'is_liked_by_user' => $isLikedByUser,
             'files' => $this->files ?? [],
-            'created_by' => $this->created_by,
+            'created_by' => $this->user?->username, // ใช้ username จากความสัมพันธ์ user()
             'created_at' => $this->created_at->toDateTimeString(),
-            'files' => $this->files
         ];
     }
 }

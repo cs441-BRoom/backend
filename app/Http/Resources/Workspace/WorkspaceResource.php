@@ -20,11 +20,10 @@ class WorkspaceResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'join_code' => $this->join_code,
-            'members_count' =>$membersCount + 1,
-            'created_by' => $this->created_by,
+            'members_count' => $membersCount + 1,
+            'created_by' => $this->user?->username, // ใช้ username จากความสัมพันธ์ user()
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
         ];
     }
 }
