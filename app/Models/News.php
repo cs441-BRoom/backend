@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class News extends Model
+{
+    use HasFactory,SoftDeletes;
+
+    protected $primaryKey = 'news_id';
+    protected $fillable = [
+        'workspace_id', 'title', 'content', 'created_by'
+    ];
+
+    // Relationships
+    public function workspace()
+    {
+        return $this->belongsTo(Workspace::class, 'workspace_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'news_id', 'news_id');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class, 'news_id', 'news_id');
+    }
+}

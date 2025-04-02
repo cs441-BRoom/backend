@@ -1,0 +1,76 @@
+### Get All new
+GET /api/workspaces/{{ owner_workspace_id }}/news HTTP/1.1
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token2 }}
+
+###  Owner Create News
+POST /api/news HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token1 }}
+
+{
+    "workspace_id": {{ owner_workspace_id }},
+    "title": "string",
+    "content": "string"
+}
+
+> {%
+    client.global.set("owner_news_id", response.body.news.news_id)
+%}
+
+
+###  Mewmber Create News
+POST /api/news HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token2 }}
+
+{
+  "workspace_id": {{ join_workspace_id }},
+  "title": "string",
+  "content": "string"
+}
+
+
+### Owner News Update
+PUT /api/news/{{ owner_news_id }} HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token1 }}
+
+{
+  "title": "tessdsdt",
+  "content": "string"
+}
+
+
+### Member Update another New
+PUT /api/news/{{ owner_news_id }} HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token2 }}
+
+{
+    "title": "stringsdads",
+    "content": "string"
+}
+
+### Owner Delete news
+DELETE /api/news/{{ owner_news_id }} HTTP/1.1
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token1 }}
+
+
+
+
+
+
+
+

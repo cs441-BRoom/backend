@@ -37,13 +37,15 @@ trait SimpleCRUD
         return $this->model::create($attributes);
     }
 
-    public function update(array $attributes, int $id)
+    public function update(array $attributes, int $news_id)
     {
-        return $this->model::where('id', $id)->update($attributes);
+        return $this->model::where('id', $news_id)->update($attributes);
     }
 
     public function delete(int $id)
     {
         return $this->model::where('id', $id)->delete();
     }
+
+
 }
