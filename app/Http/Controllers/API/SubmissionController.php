@@ -131,7 +131,7 @@ class SubmissionController extends Controller
         $validated = $request->validated();
 
         try {
-            $submission = $this->assignmentSubmissionRepository->getById($validated['submission_id']);
+            $submission = $this->assignmentSubmissionRepository->findByAssignmentIdAndUserId($validated['assignment_id'], auth()->id());
             $now = Carbon::now();
             if ($now->greaterThanOrEqualTo($submission->assignment->due_date)) {
                 return response()->json([
@@ -141,8 +141,8 @@ class SubmissionController extends Controller
 
             $this->assignmentSubmissionRepository->update([
                 'submit_at' => $now
-            ], $validated['submission_id']);
-            $submission = $this->assignmentSubmissionRepository->getById($validated['submission_id']);
+            ], $submission->submission_id);
+            $submission = $this->assignmentSubmissionRepository->findByAssignmentIdAndUserId($validated['assignment_id'], auth()->id());
 
             $assignment = $submission->assignment;
             $workspace = $submission->assignment->workspace;
@@ -151,7 +151,7 @@ class SubmissionController extends Controller
                 $files = $request->file('files');
 
                 foreach ($files as $index => $file) {
-                    $file->storeAs('workspaces/' . $workspace->workspace_id . '/assignments/' . $assignment->assignment_id . '/submissions/' . $validated['submission_id'] . '/user_id/' . auth()->id(), $index . '.' . $file->getClientOriginalExtension());
+                    $file->storeAs('workspaces/' . $workspace->workspace_id . '/assignments/' . $validated['assignment_id'] . '/submissions/' . $submission->submission_id . '/user_id/' . auth()->id(), $index . '.' . $file->getClientOriginalExtension());
                 }
             }
 

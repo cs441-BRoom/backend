@@ -22,6 +22,11 @@ class AssignmentSubmissionRepository
         return $this->model::where('assignment_id', $assignmentId)->get();
     }
 
+    public function findByAssignmentIdAndUserId(int $assignmentId, int $userId)
+    {
+        return $this->model::where('assignment_id', $assignmentId)->where('user_id', $userId)->first();
+    }
+
     public function getAllSubmissionsByUserId(int $userId): Collection
     {
         return $this->model::where('user_id', $userId)->get();

@@ -24,7 +24,7 @@ class SubmitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'submission_id' => 'required',
+            'assignment_id' => 'required',
             'files' => 'list',
             'files.*' => 'mimes:jpg,png,pdf|max:2048'
         ];
