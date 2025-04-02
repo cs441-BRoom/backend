@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\News\CreateNewsRequest;
 use App\Http\Requests\News\NewsRequest;
+use App\Http\Requests\News\ShowNewsRequest;
 use App\Http\Requests\News\UpdateNewsRequest;
 use App\Http\Resources\News\NewsResource;
+use App\Repositories\NewsRepository;
 use App\Services\NewsService;
 use Illuminate\Http\JsonResponse;
-use App\Repositories\NewsRepository;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
@@ -115,4 +116,42 @@ class NewsController extends Controller
             'message' => $deleted ? 'News deleted successfully.' : 'Failed to delete news.',
         ]);
     }
+
+
+    public function getNewsById(ShowNewsRequest $request, int $workspaceId, int $newsId): JsonResponse
+    {
+        $request->validated();
+
+        $news = $this->newsService->getNewsById($workspaceId, $newsId);
+
+        if (!$news) {
+            return response()->json([
+                'message' => 'News not found in this workspace.',
+            ], 404);
+        }
+
+        // โหลดไฟล์แนบของข่าวสาร
+        $files = Storage::files('workspaces/' . $workspaceId . '/news/' . $newsId);
+        $file_arr = [];
+        foreach ($files as $file) {
+            $content = Storage::get($file);
+            $base64File = base64_encode($content);
+            $mime = Storage::mimeType($file);
+
+            $file_arr[] = [
+                'name' => basename($file),
+                'base64' => $base64File,
+                'mime_type' => $mime
+            ];
+        }
+
+        $news->files = $file_arr;
+
+        return response()->json([
+            'message' => 'Fetched news successfully.',
+            'news' => new NewsResource($news),
+        ]);
+    }
+
+
 }
