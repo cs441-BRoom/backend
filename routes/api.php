@@ -34,9 +34,9 @@ Route::middleware('throttle:api')->group(function () {
         Route::prefix('workspaces')->group(function () {
             Route::post('/', [WorkspaceController::class, 'store']);
             Route::post('/join', [WorkspaceController::class, 'join']);
-            Route::get('/{workspaceId}',[WorkspaceController::class,'getWorkspaceById']);
             Route::get('/my', [WorkspaceController::class, 'getMyWorkspaces']);
             Route::get('/joined', [WorkspaceController::class, 'getJoinedWorkspaces']);
+            Route::get('/{workspaceId}',[WorkspaceController::class,'getWorkspaceById']);
             Route::delete('/{workspaceId}/leave', [WorkspaceController::class, 'leaveWorkspace']);
             Route::get('/{workspaceId}/news', [NewsController::class, 'index']);
             Route::get('/{workspaceId}/assignments', [AssignmentController::class, 'index']);
