@@ -32,5 +32,13 @@ class NewsRepository
         return $this->model::where('news_id', $id)->delete();
     }
 
+    public function findNewsById(int $workspaceId, int $newsId): ?News
+{
+    return $this->model::where('workspace_id', $workspaceId)
+        ->where('news_id', $newsId)
+        ->withCount('comments')
+        ->first();
+}
+
 
 }

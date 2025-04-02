@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\API\AssignmentController;
-use App\Http\Controllers\API\SubmissionController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CommentController;
 use App\Http\Controllers\API\LikeController;
 use App\Http\Controllers\API\NewsController;
+use App\Http\Controllers\API\SubmissionController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\WorkspaceController;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +39,7 @@ Route::middleware('throttle:api')->group(function () {
             Route::get('/{workspaceId}',[WorkspaceController::class,'getWorkspaceById']);
             Route::delete('/{workspaceId}/leave', [WorkspaceController::class, 'leaveWorkspace']);
             Route::get('/{workspaceId}/news', [NewsController::class, 'index']); //checked
+            Route::get('/{workspaceId}/news/{newsId}', [NewsController::class, 'getNewsById']);
             Route::get('/{workspaceId}/assignments', [AssignmentController::class, 'index']); //checked [student & teacher]
         });
 

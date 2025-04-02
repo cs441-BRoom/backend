@@ -68,6 +68,11 @@ Host: localhost
 Authorization: Bearer {{ token1 }}
 
 
+### Get News By Id
+GET /api/workspaces/7/news/20
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token2 }}
 
 
 
