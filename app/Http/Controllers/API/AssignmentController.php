@@ -30,15 +30,24 @@ class AssignmentController extends Controller
     {
         $validated = $request->validated();
 
+        $assignmentSubmissionRepository = $this->assignmentSubmissionRepository;
         try {
-            $assignments = $this->assignmentRepository->findByWorkspaceId($workspace_id);
+            $assignments = $this->assignmentRepository->findByWorkspaceId($workspace_id)->map(function($assignment) use ($assignmentSubmissionRepository) {
+                if (auth()->id() === $assignment->created_by) {
+                    $assignment->submitted_number = $assignment->assignmentSubmission->whereNotNull('submit_at')->count();
+                    $assignment->members = $assignment->assignmentSubmission->count();
+                } else {
+                    $submission = $assignmentSubmissionRepository->findByAssignmentIdAndUserId($assignment->assignment_id, auth()->id());
+                    $assignment->submit_at = $submission->submit_at;
+                    $assignment->score = $submission->score;
+                }
 
-                    return response()->json([
-                        'assignments' => AssignmentResource::collection($assignments),
-                        // 'assigned' => $assignment->assignmentSubmission->whereNotNull('submit_at')->count(),
-                        // 'submitted' => $assignment->assignmentSubmission->count()
-                    ], 200);
+                return $assignment;
+            });
 
+            return response()->json([
+                'assignments' => AssignmentResource::collection($assignments),
+            ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()

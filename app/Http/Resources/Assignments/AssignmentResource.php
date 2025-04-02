@@ -20,7 +20,11 @@ class AssignmentResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'due_date' => $this->due_date,
-            'created_by' => $this->created_by
+            'created_by' => $this->created_by,
+            'submitted_number' => (int)$this->submitted_number,
+            'members' => (int)$this->members,
+            'submission_date' => $this->submit_at,
+            'score' => (int)$this->score
         ];
     }
 }
