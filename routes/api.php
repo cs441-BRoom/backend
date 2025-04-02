@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\API\AssignmentController;
+use App\Http\Controllers\API\SubmissionController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CommentController;
 use App\Http\Controllers\API\LikeController;
@@ -37,6 +39,19 @@ Route::middleware('throttle:api')->group(function () {
             Route::get('/joined', [WorkspaceController::class, 'getJoinedWorkspaces']);
             Route::delete('/{workspaceId}/leave', [WorkspaceController::class, 'leaveWorkspace']);
             Route::get('/{workspaceId}/news', [NewsController::class, 'index']);
+            Route::get('/{workspaceId}/assignments', [AssignmentController::class, 'index']);
+            Route::get('/{workspcaeId}/assignments/{assignmentId}/submissions', [SubmissionController::class, 'index']);
+        });
+
+        Route::prefix('assignments')->group(function () {
+            Route::post('/', [AssignmentController::class, 'store']);
+            Route::get('/{assignmentId}', [AssignmentController::class, 'show']);
+        });
+
+        Route::prefix('submissions')->group(function () {
+            // update score
+            Route::post('/', [SubmissionController::class, 'update']);
+            Route::get('/{submissionId}', [SubmissionController::class, 'show']);
         });
 
         Route::prefix('news')->group(function () {

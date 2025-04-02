@@ -12,7 +12,7 @@ class AssignmentSubmission extends Model
 
     protected $primaryKey = 'submission_id';
     protected $fillable = [
-        'assignment_id', 'user_id', 'score'
+        'assignment_id', 'user_id', 'score', 'submit_at'
     ];
 
     // Relationships
