@@ -30,23 +30,35 @@ class AssignmentController extends Controller
     {
         $validated = $request->validated();
 
+        $workspace = $this->workspaceRepository->getById($workspace_id);
         $assignmentSubmissionRepository = $this->assignmentSubmissionRepository;
         try {
-            $assignments = $this->assignmentRepository->findByWorkspaceId($workspace_id)->map(function($assignment) use ($assignmentSubmissionRepository) {
-                if (auth()->id() === $assignment->created_by) {
+            if (auth()->id() === $workspace->created_by) {
+                $assignments = $this->assignmentRepository->findByWorkspaceId($workspace_id)->map(function($assignment) use ($assignmentSubmissionRepository) {
                     $assignment->submitted_number = $assignment->assignmentSubmission->whereNotNull('submit_at')->count();
                     $assignment->members = $assignment->assignmentSubmission->count();
-                } else {
-                    $submission = $assignmentSubmissionRepository->findByAssignmentIdAndUserId($assignment->assignment_id, auth()->id());
+
+                    return $assignment;
+                });
+            } else
+            {
+                $submissions = $assignmentSubmissionRepository->getAllSubmissionsByUserId(auth()->id());
+                $assignments = $submissions->filter(function($submission) use ($workspace_id) {
+                    return $workspace_id === $submission->assignment->workspace->workspace_id;
+                })->map(function($submission) {
+                    $assignment = $submission->assignment;
                     $assignment->submit_at = $submission->submit_at;
                     $assignment->score = $submission->score;
-                }
 
-                return $assignment;
-            });
-
+                    return $assignment;
+                });
+            }
+            $arr = [];
+            if ($assignments->isNotEmpty()) {
+                $arr = AssignmentResource::collection($assignments);
+            } 
             return response()->json([
-                'assignments' => AssignmentResource::collection($assignments),
+                'assignments' => $arr 
             ], 200);
         } catch (Exception $e) {
             return response()->json([
