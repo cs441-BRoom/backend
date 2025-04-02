@@ -31,7 +31,7 @@ class NewsResource extends JsonResource
             'like_count' => $this->likes()->count(),
             'is_liked_by_user' => $isLikedByUser,
             'files' => $this->files ?? [],
-            'created_by' => $this->user?->username, // ใช้ username จากความสัมพันธ์ user()
+            'created_by' => $this->user ? "{$this->user->firstname} {$this->user->lastname}" : null,
             'created_at' => $this->created_at->toDateTimeString(),
         ];
     }
