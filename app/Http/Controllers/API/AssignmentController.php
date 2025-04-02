@@ -137,10 +137,9 @@ class AssignmentController extends Controller
                 $assignment->submitted_number = $assignment->assignmentSubmission->whereNotNull('submit_at')->count();
                 $assignment->members = $assignment->assignmentSubmission->count();
 
-                return response()->json([
-                    'assignment' => new AssignmentResource($assignment),
+                return response()->json(array_merge(new AssignmentResource($assignment)->toArray(request()),[
                     'files' => $file_arr
-                ], 200);
+                ]), 200);
             } else {
                 $submission = $assignment->assignmentSubmission->where('user_id', auth()->id())->first();
                 // member
@@ -161,11 +160,10 @@ class AssignmentController extends Controller
                 $assignment->submit_at = $submission->submit_at;
                 $assignment->score = $submission->score;
 
-                return response()->json([
-                    'assignment' => new AssignmentResource($assignment),
+                return response()->json(array_merge(new AssignmentResource($assignment)->toArray(request()),[
                     'status' => $status,
                     'files' => $file_arr
-                ], 200);
+                ]), 200);
             }
 
 

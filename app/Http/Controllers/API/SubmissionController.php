@@ -88,11 +88,56 @@ class SubmissionController extends Controller
                 $status = 'submitted';
             }
 
-            return response()->json([
-                'submission' => new SubmissionResource($submission),
+            return response()->json(array_merge(new SubmissionResource($submission)->toArray(request()),[
                 'status' => $status,
                 'files' => $file_arr
-            ], 200);
+            ]), 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+    public function mysubmission(int $assignment_id)
+    {
+        try {
+            $submission = $this->assignmentSubmissionRepository->findByAssignmentIdAndUserId($assignment_id, auth()->id());
+            $submission_id = $submission->submission_id;
+
+            $workspace_id = $submission->assignment->workspace->workspace_id;
+
+            $files = Storage::files('workspaces/'. $workspace_id . '/assignments/' . $assignment_id . '/submissions/' . $submission_id . '/user_id/' . $submission->user_id);
+            $file_arr = [];
+            foreach ($files as $file) {
+                $content = Storage::get($file);
+                $base64File = base64_encode($content);
+                $mime = Storage::mimeType($file);
+
+                $file_arr[] = [
+                    'name' => $file,
+                    'base64' => $base64File,
+                    'mime_type' => $mime
+                ];
+            }
+
+            if ($submission->submit_at === null) {
+                $now = Carbon::now();
+                if ($now->lessThan($submission->assignment->due_date)) {
+                    $status = 'in-progress';
+
+                } else {
+                    $status = 'late';
+                }
+
+            } else {
+                $status = 'submitted';
+            }
+
+            return response()->json(array_merge(new SubmissionResource($submission)->toArray(request()),[
+                'status' => $status,
+                'files' => $file_arr
+            ]), 200);
 
         } catch (Exception $e) {
             return response()->json([

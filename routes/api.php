@@ -43,6 +43,7 @@ Route::middleware('throttle:api')->group(function () {
         });
 
         Route::prefix('assignments')->group(function () {
+            Route::get('/{assignmentId}/mysubmission', [SubmissionController::class, 'mysubmission']); //checked
             Route::get('/{assignmentId}/submissions', [SubmissionController::class, 'index']); //checked
             Route::post('/', [AssignmentController::class, 'store']); //checked
             Route::get('/{assignmentId}', [AssignmentController::class, 'show']); //checked [student & teacher]
