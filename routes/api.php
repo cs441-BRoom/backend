@@ -38,7 +38,7 @@ Route::middleware('throttle:api')->group(function () {
             Route::get('/joined', [WorkspaceController::class, 'getJoinedWorkspaces']);
             Route::get('/{workspaceId}',[WorkspaceController::class,'getWorkspaceById']);
             Route::delete('/{workspaceId}/leave', [WorkspaceController::class, 'leaveWorkspace']);
-            Route::get('/{workspaceId}/news', [NewsController::class, 'index']);
+            Route::get('/{workspaceId}/news', [NewsController::class, 'index']); //checked
             Route::get('/{workspaceId}/assignments', [AssignmentController::class, 'index']); //checked [student & teacher]
         });
 
@@ -52,7 +52,7 @@ Route::middleware('throttle:api')->group(function () {
             // update score
             Route::post('/', [SubmissionController::class, 'update']); //checked
             Route::post('/submit', [SubmissionController::class, 'submit']); //checked
-            Route::get('/{submissionId}', [SubmissionController::class, 'show']);
+            Route::get('/{submissionId}', [SubmissionController::class, 'show']); //checked
         });
 
         Route::prefix('news')->group(function () {

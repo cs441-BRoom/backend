@@ -32,6 +32,7 @@ class NewsResource extends JsonResource
             'is_liked_by_user' => $isLikedByUser,
             'created_by' => $this->created_by,
             'created_at' => $this->created_at->toDateTimeString(),
+            'files' => $this->files
         ];
     }
 }

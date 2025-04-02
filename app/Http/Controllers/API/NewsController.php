@@ -26,6 +26,25 @@ class NewsController extends Controller
     {
         $request->validated();
         $news = $this->newsService->getAllNewsByWorkspace($workspaceId);
+        $news->map(function ($new) use ($workspaceId) {
+            $files = Storage::files('workspaces/'. $workspaceId . '/news/' . $new->news_id);
+            $file_arr = [];
+            foreach ($files as $file) {
+                $content = Storage::get($file);
+                $base64File = base64_encode($content);
+                $mime = Storage::mimeType($file);
+
+                $file_arr[] = [
+                    'name' => $file,
+                    'base64' => $base64File,
+                    'mime_type' => $mime
+                ];
+            }
+
+            $new->files = $file_arr;
+
+            return $new;
+        });
         return response()->json([
             'message' => 'Fetched news successfully.',
             'news' => NewsResource::collection($news),
