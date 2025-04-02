@@ -14,13 +14,15 @@ class CreateNewsRequest extends FormRequest
     public function authorize(): bool
     {
         $user = auth()->user();
-        $workspaceId = $this->input('workspace_id');
+        $workspaceId = (int) $this->route('workspaceId'); // แปลงให้เป็น int
 
         $isAuthorized = Workspace::where('workspace_id', $workspaceId)
-            ->whereHas('users', function ($query) use ($user) {
-                $query->where('workspace_members.user_id', $user->user_id);
+            ->where(function ($query) use ($user) {
+                $query->whereHas('users', function ($subQuery) use ($user) {
+                    $subQuery->where('workspace_members.user_id', $user->user_id);
+                })
+                    ->orWhere('created_by', $user->user_id);
             })
-            ->orWhere('created_by', $user->user_id)
             ->exists();
 
         if (!$isAuthorized) {
@@ -29,6 +31,7 @@ class CreateNewsRequest extends FormRequest
 
         return $isAuthorized;
     }
+
 
     /**
      * Get the validation rules that apply to the request.
