@@ -1,5 +1,5 @@
 ### Get All new
-GET /api/workspaces/{{ owner_workspace_id }}/news HTTP/1.1
+GET /api/workspaces/1/news HTTP/1.1
 Accept: application/json
 Host: localhost
 Authorization: Bearer {{ token2 }}

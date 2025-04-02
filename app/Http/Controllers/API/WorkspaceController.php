@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Workspace\GetWorkspaceByIdRequest;
 use App\Http\Requests\Workspace\JoinWorkspaceRequest;
 use App\Http\Requests\Workspace\WorkspaceRequest;
 use App\Http\Resources\Workspace\WorkspaceResource;
@@ -60,7 +59,7 @@ class WorkspaceController extends Controller
         ]);
     }
 
-    public function getWorkspaceById(GetWorkspaceByIdRequest $request,int $workspaceId): JsonResponse
+    public function getWorkspaceById(int $workspaceId): JsonResponse
     {
         $workspace = $this->workspaceService->getWorkspaceByID($workspaceId);
         return response()->json([

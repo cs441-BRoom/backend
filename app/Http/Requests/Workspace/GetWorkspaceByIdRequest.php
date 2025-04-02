@@ -14,7 +14,7 @@ class GetWorkspaceByIdRequest extends FormRequest
     public function authorize(): bool
     {
         $user = auth()->user();
-        $workspaceId = $this->route('workspaceId');
+            $workspaceId = (int) $this->route('workspaceId'); // แปลงให้เป็น int
 
         $isAuthorized = Workspace::where('workspace_id', $workspaceId)
             ->where(function ($query) use ($user) {
@@ -29,7 +29,7 @@ class GetWorkspaceByIdRequest extends FormRequest
             throw new AuthorizationException('You are not authorized to access this workspace.');
         }
 
-        return true;
+        return $isAuthorized;
     }
 
 

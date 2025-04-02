@@ -20,7 +20,7 @@ POST /api/workspaces/join HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 Host: localhost
-Authorization: Bearer {{ token2 }}
+Authorization: Bearer {{ token3 }}
 
 {
     "join_code": "{{ join_code }}"
@@ -34,7 +34,7 @@ Authorization: Bearer {{ token2 }}
 GET /api/workspaces/my HTTP/1.1
 Accept: application/json
 Host: localhost
-Authorization: Bearer {{ token1 }}
+Authorization: Bearer {{ token2 }}
 
 ### Get Joined Workspace
 GET /api/workspaces/joined HTTP/1.1
