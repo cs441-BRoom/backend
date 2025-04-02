@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Workspace\GetWorkspaceByIdRequest;
 use App\Http\Requests\Workspace\JoinWorkspaceRequest;
 use App\Http\Requests\Workspace\WorkspaceRequest;
 use App\Http\Resources\Workspace\WorkspaceResource;
@@ -56,6 +57,15 @@ class WorkspaceController extends Controller
         return response()->json([
             'message' => 'Fetched created workspaces.',
             'workspaces' => WorkspaceResource::collection($workspaces),
+        ]);
+    }
+
+    public function getWorkspaceById(GetWorkspaceByIdRequest $request,int $workspaceId): JsonResponse
+    {
+        $workspace = $this->workspaceService->getWorkspaceByID($workspaceId);
+        return response()->json([
+            'message' => 'Fetched workspace.',
+            'workspace' => $workspace
         ]);
     }
 

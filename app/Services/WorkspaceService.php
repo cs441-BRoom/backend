@@ -68,6 +68,11 @@ class WorkspaceService
         return $this->workspaceRepository->findJoinedWorkspacesByUserId($userId);
     }
 
+    public function getWorkspaceByID(int $id)
+    {
+        return $this->workspaceRepository->getById($id);
+    }
+
     public function leaveWorkspace(int $userId, int $workspaceId)
     {
         $member = $this->workspaceMemberRepository->findByUserAndWorkspace($userId, $workspaceId);

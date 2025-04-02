@@ -49,6 +49,13 @@ Host: localhost
 Authorization: Bearer {{ token2 }}
 
 
+### Get WorkspaceByID
+GET /api/workspaces/3 HTTP/1.1
+Accept: application/json
+Host: localhost
+Authorization: Bearer {{ token2 }}
+
+
 
 
 
