@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -32,11 +33,26 @@ class AuthController extends Controller
     public function login(LoginRequest $request){
         try {
             $data = $this->authService->login($request->validated());
+            
+            $files = Storage::files('users/profiles/'. $data['user']->user_id);
+            $file_arr = [];
+            foreach ($files as $file) {
+                $content = Storage::get($file);
+                $base64File = base64_encode($content);
+                $mime = Storage::mimeType($file);
+
+                $file_arr[] = [
+                    'name' => $file,
+                    'base64' => $base64File,
+                    'mime_type' => $mime
+                ];
+            }
 
             return response()->json([
                 'message' => 'Login successfully',
                 'user' => new UserResource($data['user']),
-                'token' => $data['token']
+                'token' => $data['token'],
+                'files' => $file_arr
             ]);
         } catch (ValidationException $e) {
             return response()->json([

@@ -118,13 +118,20 @@ class AssignmentController extends Controller
                     'base64' => $base64File,
                     'mime_type' => $mime
                 ];
-    }
+            }
 
-                if (auth()->id() === $assignment->workspace->created_by) {
-                    //admin
-                } else {
-                    $submission = $assignment->assignmentSubmission->where('user_id', auth()->id())->first();
-                    // member
+            if (auth()->id() === $assignment->workspace->created_by) {
+                //admin
+                $assignment->submitted_number = $assignment->assignmentSubmission->whereNotNull('submit_at')->count();
+                $assignment->members = $assignment->assignmentSubmission->count();
+
+                return response()->json([
+                    'assignment' => new AssignmentResource($assignment),
+                    'files' => $file_arr
+                ], 200);
+            } else {
+                $submission = $assignment->assignmentSubmission->where('user_id', auth()->id())->first();
+                // member
         
                 if ($submission->submit_at === null) {
                     $now = Carbon::now();
@@ -138,18 +145,17 @@ class AssignmentController extends Controller
                 } else {
                     $status = 'submitted';
                 }
-                }
 
+                $assignment->submit_at = $submission->submit_at;
+                $assignment->score = $submission->score;
 
+                return response()->json([
+                    'assignment' => new AssignmentResource($assignment),
+                    'status' => $status,
+                    'files' => $file_arr
+                ], 200);
+            }
 
-
-                    return response()->json([
-                        'assignment' => new AssignmentResource($assignment),
-                        'status' => $status,
-                        'files' => $file_arr
-                        // 'assigned' => $assignment->assignmentSubmission->whereNotNull('submit_at')->count(),
-                        // 'submitted' => $assignment->assignmentSubmission->count()
-                    ], 200);
 
         } catch (Exception $e) {
             return response()->json([

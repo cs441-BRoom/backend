@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Submissions\UpdateRequest;
+use App\Http\Requests\Submissions\SubmitRequest;
 use App\Models\AssignmentSubmission;
 use Illuminate\Http\Request;
 use App\Repositories\AssignmentSubmissionRepository;
@@ -22,7 +23,7 @@ class SubmissionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(int $workspace_id, int $assignment_id)
+    public function index(int $assignment_id)
     {
         try {
             $submissions = $this->assignmentSubmissionRepository->findByAssignmentId($assignment_id);
@@ -72,30 +73,26 @@ class SubmissionController extends Controller
                     'base64' => $base64File,
                     'mime_type' => $mime
                 ];
-    }
+            }
 
-
-                if ($submission->submit_at === null) {
-                    $now = Carbon::now();
-                    if ($now->lessThan($submission->assignment->due_date)) {
-                        $status = 'in-progress';
-
-                    } else {
-                        $status = 'late';
-                    }
+            if ($submission->submit_at === null) {
+                $now = Carbon::now();
+                if ($now->lessThan($submission->assignment->due_date)) {
+                    $status = 'in-progress';
 
                 } else {
-                    $status = 'submitted';
+                    $status = 'late';
                 }
 
+            } else {
+                $status = 'submitted';
+            }
 
-                    return response()->json([
-                        'submission' => new SubmissionResource($submission),
-                        'status' => $status,
-                        'files' => $file_arr
-                        // 'assigned' => $assignment->assignmentSubmission->whereNotNull('submit_at')->count(),
-                        // 'submitted' => $assignment->assignmentSubmission->count()
-                    ], 200);
+            return response()->json([
+                'submission' => new SubmissionResource($submission),
+                'status' => $status,
+                'files' => $file_arr
+            ], 200);
 
         } catch (Exception $e) {
             return response()->json([
@@ -112,6 +109,28 @@ class SubmissionController extends Controller
         $validated = $request->validated();
 
         try {
+            $this->assignmentSubmissionRepository->update([
+                'score' => $validated['score'],
+            ], $validated['submission_id']);
+
+            $submission = $this->assignmentSubmissionRepository->getById($validated['submission_id']);
+
+            return response()->json(
+                new SubmissionResource($submission),
+            200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function submit(SubmitRequest $request)
+    {
+        $validated = $request->validated();
+
+        try {
             $submission = $this->assignmentSubmissionRepository->getById($validated['submission_id']);
             $now = Carbon::now();
             if ($now->greaterThanOrEqualTo($submission->assignment->due_date)) {
@@ -121,18 +140,18 @@ class SubmissionController extends Controller
             }
 
             $this->assignmentSubmissionRepository->update([
-                'score' => $validated['score'],
                 'submit_at' => $now
             ], $validated['submission_id']);
             $submission = $this->assignmentSubmissionRepository->getById($validated['submission_id']);
 
+            $assignment = $submission->assignment;
             $workspace = $submission->assignment->workspace;
 
             if ($request->hasFile('files')) {
                 $files = $request->file('files');
 
                 foreach ($files as $index => $file) {
-                    $file->storeAs('workspaces/' . $workspace->workspace_id . '/assignments/' . $validated['assignment_id'] . '/submissions/' . $validated['submission_id'] . '/user_id/' . auth()->id(), $index . '.' . $file->getClientOriginalExtension());
+                    $file->storeAs('workspaces/' . $workspace->workspace_id . '/assignments/' . $assignment->assignment_id . '/submissions/' . $validated['submission_id'] . '/user_id/' . auth()->id(), $index . '.' . $file->getClientOriginalExtension());
                 }
             }
 

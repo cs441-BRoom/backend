@@ -1,24 +1,20 @@
 <?php
 
-namespace App\Http\Requests\News;
+namespace App\Http\Requests\Submissions;
 
-use App\Models\News;
+use App\Models\Assignment;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateNewsRequest extends FormRequest
+class SubmitRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        $user = auth()->user();
-        $newsId = $this->route('newsId');
-        $news = News::findOrFail($newsId);
-
-        return $news->created_by == $user->user_id;
+        return true;
     }
-
 
     /**
      * Get the validation rules that apply to the request.
@@ -28,10 +24,9 @@ class UpdateNewsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'sometimes|string|max:255',
-            'content' => 'sometimes|string',
+            'submission_id' => 'required',
             'files' => 'list',
-            'files.*' => 'mimes:jpg,png|max:2048'
+            'files.*' => 'mimes:jpg,png,pdf|max:2048'
         ];
     }
 }

@@ -13,23 +13,7 @@ class CreateNewsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $user = auth()->user();
-        $workspaceId = (int) $this->route('workspaceId'); // แปลงให้เป็น int
-
-        $isAuthorized = Workspace::where('workspace_id', $workspaceId)
-            ->where(function ($query) use ($user) {
-                $query->whereHas('users', function ($subQuery) use ($user) {
-                    $subQuery->where('workspace_members.user_id', $user->user_id);
-                })
-                    ->orWhere('created_by', $user->user_id);
-            })
-            ->exists();
-
-        if (!$isAuthorized) {
-            throw new AuthorizationException('You are not authorized to access this workspace.');
-        }
-
-        return $isAuthorized;
+        return true;
     }
 
 
@@ -44,6 +28,8 @@ class CreateNewsRequest extends FormRequest
             'workspace_id' => 'required|exists:workspaces,workspace_id',
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'files' => 'list',
+            'files.*' => 'mimes:jpg,png|max:2048'
         ];
     }
 }
