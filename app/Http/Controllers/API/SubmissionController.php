@@ -27,6 +27,12 @@ class SubmissionController extends Controller
     {
         try {
             $submissions = $this->assignmentSubmissionRepository->findByAssignmentId($assignment_id);
+            $submissions->map(function($submission) {
+                $user = $submission->user;
+                $submission->user_full_name = $user->firstname . ' ' . $user->lastname;
+                $submission->user_username = $user->username;
+                return $submission;
+            });
 
                     return response()->json([
                         'submissions' => SubmissionResource::collection($submissions),
@@ -87,6 +93,10 @@ class SubmissionController extends Controller
             } else {
                 $status = 'submitted';
             }
+            
+            $user = $submission->user;
+            $submission->user_full_name = $user->firstname . ' ' . $user->lastname;
+            $submission->user_username = $user->username;
 
             return response()->json(array_merge(new SubmissionResource($submission)->toArray(request()),[
                 'status' => $status,

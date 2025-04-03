@@ -19,7 +19,9 @@ class SubmissionResource extends JsonResource
             'assignment_id' => $this->assignment_id,
             'user_id' => $this->user_id,
             'score' => $this->score,
-            'submit_at' => $this->submit_at
+            'submit_at' => $this->submit_at,
+            'user_full_name' => $this->user_full_name,
+            'user_username' => $this->user_username,
         ];
     }
 }
