@@ -30,7 +30,8 @@ class NewsResource extends JsonResource
             'comments_count' => $this->comments_count,
             'like_count' => $this->likes()->count(),
             'is_liked_by_user' => $isLikedByUser,
-            'created_by' => $this->created_by,
+            'files' => $this->files ?? [],
+            'created_by' => $this->user ? "{$this->user->firstname} {$this->user->lastname}" : null,
             'created_at' => $this->created_at->toDateTimeString(),
         ];
     }

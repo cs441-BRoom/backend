@@ -64,3 +64,33 @@ Content-Type: application/json
 }
 
 
+### login testuesr3
+POST http://localhost:80/api/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "username": "testuser3",
+    "password": "password123"
+}
+
+
+> {%
+    client.global.set("token3", response.body.token)
+%}
+
+### Register testuesr3
+POST http://localhost:80/api/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+    "username": "testuser3",
+    "firstname": "John",
+    "lastname": "Doe",
+    "email": "testuser3@example.com",
+    "auth_type": "local",
+    "password": "password123",
+    "password_confirmation": "password123"
+}
+

@@ -25,10 +25,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'submission_id' => 'required',
-            'assignment_id' => 'required',
             'score' => 'numeric',
-            'files' => 'list',
-            'files.*' => 'mimes:jpg,png,pdf|max:2048'
         ];
     }
 }

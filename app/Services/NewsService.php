@@ -44,4 +44,11 @@ class NewsService
         return $this->newsRepository->delete($newsId);
     }
 
+    public function getNewsById(int $workspaceId, int $newsId): ?News
+    {
+        return $this->newsRepository->findNewsById($workspaceId, $newsId);
+    }
+
+
+
 }

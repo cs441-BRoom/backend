@@ -17,7 +17,7 @@ class CommentResource extends JsonResource
         return [
             'comment_id' => $this->comment_id,
             'news_id' => $this->news_id,
-            'created_by' => $this->created_by,
+            'created_by' => $this->user ? "{$this->user->firstname} {$this->user->lastname}" : null,
             'content' => $this->content,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

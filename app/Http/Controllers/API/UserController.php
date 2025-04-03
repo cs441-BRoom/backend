@@ -26,7 +26,7 @@ class UserController extends Controller
 
         try {
             $file = $request->file('image');
-            $file->storeAs('users/profiles', auth()->id() . '.' . $file->getClientOriginalExtension());
+            $file->storeAs('users/profiles/' . auth()->id(), 'profile.' . $file->getClientOriginalExtension());
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()

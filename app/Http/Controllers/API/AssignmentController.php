@@ -11,6 +11,7 @@ use App\Models\Assignment;
 use App\Repositories\AssignmentRepository;
 use App\Repositories\AssignmentSubmissionRepository;
 use App\Repositories\WorkspaceRepository;
+use App\Repositories\UserRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -20,7 +21,8 @@ class AssignmentController extends Controller
     public function __construct(
         private AssignmentRepository $assignmentRepository,
         private AssignmentSubmissionRepository $assignmentSubmissionRepository,
-        private WorkspaceRepository $workspaceRepository
+        private WorkspaceRepository $workspaceRepository,
+        private UserRepository $userRepository
     ) { }
 
     /**
@@ -30,15 +32,42 @@ class AssignmentController extends Controller
     {
         $validated = $request->validated();
 
+        $workspace = $this->workspaceRepository->getById($workspace_id);
+        $assignmentSubmissionRepository = $this->assignmentSubmissionRepository;
         try {
-            $assignments = $this->assignmentRepository->findByWorkspaceId($workspace_id);
+            if (auth()->id() === $workspace->created_by) {
+                $assignments = $this->assignmentRepository->findByWorkspaceId($workspace_id)->map(function($assignment) use ($assignmentSubmissionRepository) {
+                    $user = $assignment->user;
+                    $assignment->submitted_number = $assignment->assignmentSubmission->whereNotNull('submit_at')->count();
+                    $assignment->members = $assignment->assignmentSubmission->count();
+                    $assignment->created_by_full_name = $user->firstname . ' ' . $user->lastname;
+                    $assignment->created_by_username = $user->username;
 
-                    return response()->json([
-                        'assignments' => AssignmentResource::collection($assignments),
-                        // 'assigned' => $assignment->assignmentSubmission->whereNotNull('submit_at')->count(),
-                        // 'submitted' => $assignment->assignmentSubmission->count()
-                    ], 200);
+                    return $assignment;
+                });
+            } else
+            {
+                $submissions = $assignmentSubmissionRepository->getAllSubmissionsByUserId(auth()->id());
+                $assignments = $submissions->filter(function($submission) use ($workspace_id) {
+                    return $workspace_id === $submission->assignment->workspace->workspace_id;
+                })->map(function($submission) {
+                    $assignment = $submission->assignment;
+                    $user = $assignment->user;
+                    $assignment->submit_at = $submission->submit_at;
+                    $assignment->score = $submission->score;
+                    $assignment->created_by_full_name = $user->firstname . ' ' . $user->lastname;
+                    $assignment->created_by_username = $user->username;
 
+                    return $assignment;
+                });
+            }
+            $arr = [];
+            if ($assignments->isNotEmpty()) {
+                $arr = AssignmentResource::collection($assignments);
+            } 
+            return response()->json([
+                'assignments' => $arr 
+            ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -109,13 +138,26 @@ class AssignmentController extends Controller
                     'base64' => $base64File,
                     'mime_type' => $mime
                 ];
-    }
+            }
 
-                if (auth()->id() === $assignment->workspace->created_by) {
-                    //admin
-                } else {
-                    $submission = $assignment->assignmentSubmission->where('user_id', auth()->id())->first();
-                    // member
+            if (auth()->id() === $assignment->workspace->created_by) {
+                //admin
+                $user = $assignment->user;
+                $assignment->submitted_number = $assignment->assignmentSubmission->whereNotNull('submit_at')->count();
+                $assignment->members = $assignment->assignmentSubmission->count();
+                $assignment->created_by_full_name = $user->firstname . ' ' . $user->lastname;
+                $assignment->created_by_username = $user->username;
+
+                return response()->json(array_merge(new AssignmentResource($assignment)->toArray(request()),[
+                    'files' => $file_arr
+                ]), 200);
+            } else {
+                $submission = $assignment->assignmentSubmission->where('user_id', auth()->id())->first();
+                // member
+
+                $user = $assignment->user;
+                $assignment->created_by_full_name = $user->firstname . ' ' . $user->lastname;
+                $assignment->created_by_username = $user->username;
         
                 if ($submission->submit_at === null) {
                     $now = Carbon::now();
@@ -129,18 +171,16 @@ class AssignmentController extends Controller
                 } else {
                     $status = 'submitted';
                 }
-                }
 
+                $assignment->submit_at = $submission->submit_at;
+                $assignment->score = $submission->score;
 
+                return response()->json(array_merge(new AssignmentResource($assignment)->toArray(request()),[
+                    'status' => $status,
+                    'files' => $file_arr
+                ]), 200);
+            }
 
-
-                    return response()->json([
-                        'assignment' => new AssignmentResource($assignment),
-                        'status' => $status,
-                        'files' => $file_arr
-                        // 'assigned' => $assignment->assignmentSubmission->whereNotNull('submit_at')->count(),
-                        // 'submitted' => $assignment->assignmentSubmission->count()
-                    ], 200);
 
         } catch (Exception $e) {
             return response()->json([

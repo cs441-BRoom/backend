@@ -24,6 +24,12 @@ class Workspace extends Model
         return $this->belongsToMany(User::class, 'workspace_members', 'workspace_id', 'user_id')->withPivot('role')->withTimestamps();
     }
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function news()
     {
         return $this->hasMany(News::class, 'workspace_id');

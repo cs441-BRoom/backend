@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Submissions\UpdateRequest;
+use App\Http\Requests\Submissions\SubmitRequest;
 use App\Models\AssignmentSubmission;
 use Illuminate\Http\Request;
 use App\Repositories\AssignmentSubmissionRepository;
@@ -22,10 +23,16 @@ class SubmissionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(int $workspace_id, int $assignment_id)
+    public function index(int $assignment_id)
     {
         try {
             $submissions = $this->assignmentSubmissionRepository->findByAssignmentId($assignment_id);
+            $submissions->map(function($submission) {
+                $user = $submission->user;
+                $submission->user_full_name = $user->firstname . ' ' . $user->lastname;
+                $submission->user_username = $user->username;
+                return $submission;
+            });
 
                     return response()->json([
                         'submissions' => SubmissionResource::collection($submissions),
@@ -72,30 +79,75 @@ class SubmissionController extends Controller
                     'base64' => $base64File,
                     'mime_type' => $mime
                 ];
-    }
+            }
 
-
-                if ($submission->submit_at === null) {
-                    $now = Carbon::now();
-                    if ($now->lessThan($submission->assignment->due_date)) {
-                        $status = 'in-progress';
-
-                    } else {
-                        $status = 'late';
-                    }
+            if ($submission->submit_at === null) {
+                $now = Carbon::now();
+                if ($now->lessThan($submission->assignment->due_date)) {
+                    $status = 'in-progress';
 
                 } else {
-                    $status = 'submitted';
+                    $status = 'late';
                 }
 
+            } else {
+                $status = 'submitted';
+            }
+            
+            $user = $submission->user;
+            $submission->user_full_name = $user->firstname . ' ' . $user->lastname;
+            $submission->user_username = $user->username;
 
-                    return response()->json([
-                        'submission' => new SubmissionResource($submission),
-                        'status' => $status,
-                        'files' => $file_arr
-                        // 'assigned' => $assignment->assignmentSubmission->whereNotNull('submit_at')->count(),
-                        // 'submitted' => $assignment->assignmentSubmission->count()
-                    ], 200);
+            return response()->json(array_merge(new SubmissionResource($submission)->toArray(request()),[
+                'status' => $status,
+                'files' => $file_arr
+            ]), 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+    public function mysubmission(int $assignment_id)
+    {
+        try {
+            $submission = $this->assignmentSubmissionRepository->findByAssignmentIdAndUserId($assignment_id, auth()->id());
+            $submission_id = $submission->submission_id;
+
+            $workspace_id = $submission->assignment->workspace->workspace_id;
+
+            $files = Storage::files('workspaces/'. $workspace_id . '/assignments/' . $assignment_id . '/submissions/' . $submission_id . '/user_id/' . $submission->user_id);
+            $file_arr = [];
+            foreach ($files as $file) {
+                $content = Storage::get($file);
+                $base64File = base64_encode($content);
+                $mime = Storage::mimeType($file);
+
+                $file_arr[] = [
+                    'name' => $file,
+                    'base64' => $base64File,
+                    'mime_type' => $mime
+                ];
+            }
+
+            if ($submission->submit_at === null) {
+                $now = Carbon::now();
+                if ($now->lessThan($submission->assignment->due_date)) {
+                    $status = 'in-progress';
+
+                } else {
+                    $status = 'late';
+                }
+
+            } else {
+                $status = 'submitted';
+            }
+
+            return response()->json(array_merge(new SubmissionResource($submission)->toArray(request()),[
+                'status' => $status,
+                'files' => $file_arr
+            ]), 200);
 
         } catch (Exception $e) {
             return response()->json([
@@ -112,7 +164,29 @@ class SubmissionController extends Controller
         $validated = $request->validated();
 
         try {
+            $this->assignmentSubmissionRepository->update([
+                'score' => $validated['score'],
+            ], $validated['submission_id']);
+
             $submission = $this->assignmentSubmissionRepository->getById($validated['submission_id']);
+
+            return response()->json(
+                new SubmissionResource($submission),
+            200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function submit(SubmitRequest $request)
+    {
+        $validated = $request->validated();
+
+        try {
+            $submission = $this->assignmentSubmissionRepository->findByAssignmentIdAndUserId($validated['assignment_id'], auth()->id());
             $now = Carbon::now();
             if ($now->greaterThanOrEqualTo($submission->assignment->due_date)) {
                 return response()->json([
@@ -121,18 +195,18 @@ class SubmissionController extends Controller
             }
 
             $this->assignmentSubmissionRepository->update([
-                'score' => $validated['score'],
                 'submit_at' => $now
-            ], $validated['submission_id']);
-            $submission = $this->assignmentSubmissionRepository->getById($validated['submission_id']);
+            ], $submission->submission_id);
+            $submission = $this->assignmentSubmissionRepository->findByAssignmentIdAndUserId($validated['assignment_id'], auth()->id());
 
+            $assignment = $submission->assignment;
             $workspace = $submission->assignment->workspace;
 
             if ($request->hasFile('files')) {
                 $files = $request->file('files');
 
                 foreach ($files as $index => $file) {
-                    $file->storeAs('workspaces/' . $workspace->workspace_id . '/assignments/' . $validated['assignment_id'] . '/submissions/' . $validated['submission_id'] . '/user_id/' . auth()->id(), $index . '.' . $file->getClientOriginalExtension());
+                    $file->storeAs('workspaces/' . $workspace->workspace_id . '/assignments/' . $validated['assignment_id'] . '/submissions/' . $submission->submission_id . '/user_id/' . auth()->id(), $index . '.' . $file->getClientOriginalExtension());
                 }
             }
 
